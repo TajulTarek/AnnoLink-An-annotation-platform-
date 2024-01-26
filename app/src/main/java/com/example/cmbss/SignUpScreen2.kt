@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -79,11 +80,19 @@ fun SignUp2() {
     var photoselect by remember { mutableStateOf("Select a Profile Photo") }
     val nameValue = remember { mutableStateOf("") }
     val uniName = remember { mutableStateOf("") }
+    val studentId = remember { mutableStateOf("") }
+    var currentSem by remember { mutableStateOf("Select Current Semester") }
+    var expandedSem by remember { mutableStateOf(false) }
     val phoneValue = remember { mutableStateOf("") }
     val githubLink = remember { mutableStateOf("") }
+    val linkedinLink = remember { mutableStateOf("") }
     val confirmPasswordValue = remember { mutableStateOf("") }
     val passwordVisibility = remember { mutableStateOf(false) }
     val confirmPasswordVisibility = remember { mutableStateOf(false) }
+    val semesters = arrayOf("1st Semester",
+        "2nd Semester", "3rd Semester", "4th Semester",
+        "5th Semester", "6th Semester", "7th Semester", "8th Semester"
+    )
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -133,13 +142,14 @@ fun SignUp2() {
                     )
                 }
                 Spacer(modifier = Modifier.padding(10.dp))
-                textfield(ondisplay = "Enter Your FullName", value = nameValue,placeholder="Name")
-                textfield(ondisplay = "Enter Your University Name", value = uniName, placeholder = "University")
+                textfield(ondisplay = "Enter Fullname", value = nameValue,placeholder="Name")
+                textfield(ondisplay = "Enter University Name", value = uniName, placeholder = "University")
+                textfield(ondisplay = "Enter Your ID", value = studentId, placeholder = "your Id")
                 OutlinedTextField(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(color = Color.White),
-                    label = { Text(text = "Enter Your Phone Number") },
+                    label = { Text(text = "Enter phone number") },
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         focusedBorderColor = Color.White,
                         focusedLabelColor = Primary,
@@ -156,11 +166,20 @@ fun SignUp2() {
 
                 )
                 Spacer(modifier = Modifier.padding(10.dp))
-                textfield(ondisplay = "Enter Your Github Link", value = githubLink, placeholder = "github")
+
                 var expanded by remember { mutableStateOf(false) }
-                var selectedSubject by remember { mutableStateOf("Select Subject") }
+                var selectedSubject by remember { mutableStateOf("Select Your Department") }
                 val bgcolor = Color(0xFF3EA7D7)
-                val subjects = arrayOf("CSE", "EEE", "SWE")
+                val subjects = arrayOf("Department of Computer Science & Engineering (CSE)",
+                    "Department of Architecture (ARC)",
+                    "Department of Chemical Engineering & Polymer Science (CEP)",
+                    "Department of Civil & Environmental Engineering (CEE)",
+                    "Department of Electrical & Electronic Engineering (EEE)",
+                    "Department of Food Engineering & Tea Technology (FET)",
+                    "Department of Industrial & Production Engineering (IPE)",
+                    "Department of Mechanical Engineering (MEE)",
+                    "Department of Petroleum & Mining Engineering (PME)"
+                )
 
                 Box(
                     modifier = Modifier
@@ -182,9 +201,39 @@ fun SignUp2() {
                                     onClick = {
                                         selectedSubject=it
                                         expanded=false
-                                    },
-                                    modifier=Modifier
-                                        .background(bgcolor)
+                                    }//,
+                                    //modifier=Modifier
+                                      //  .background(Color.White)
+                                )
+                            }
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.padding(10.dp))
+                ////
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    ExposedDropdownMenuBox(expanded = expandedSem, onExpandedChange = {expandedSem= !expandedSem}
+
+                    ) {
+                        TextField(value = currentSem ,onValueChange = {}, readOnly = true,
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedSem)
+                            },
+                            modifier=Modifier.menuAnchor()
+                        )
+                        ExposedDropdownMenu(expanded = expandedSem, onDismissRequest = { expandedSem=false }) {
+                            semesters.forEach {
+                                DropdownMenuItem(
+                                    text = { Text(text=it) },
+                                    onClick = {
+                                        currentSem=it
+                                        expandedSem=false
+                                    }//,
+                                    //modifier=Modifier
+                                    //  .background(Color.White)
                                 )
 
                             }
@@ -192,10 +241,25 @@ fun SignUp2() {
                     }
 
                 }
+                Spacer(modifier = Modifier.padding(10.dp))
+                textfield(ondisplay = "Enter Github Link", value = githubLink, placeholder = "github")
+                textfield(ondisplay = "Enter linkedin Link", value = linkedinLink, placeholder = "linkedin")
 
+                Button(onClick = {
 
-
-
+                }, modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 50.dp),
+                    shape = RoundedCornerShape(5.dp)
+                ) {
+                    Text(text = "Create",
+                        style = TextStyle(
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Medium,
+                            fontStyle = FontStyle.Normal,
+                            letterSpacing = 1.sp,
+                        ))
+                }
             }
 
         }

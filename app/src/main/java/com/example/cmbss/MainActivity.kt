@@ -54,8 +54,8 @@ class MainActivity : ComponentActivity(), SignInCallBack {
 
 
 
-                signin(signInCallBack)
-                //SignUp2()
+                //signin(signInCallBack)
+                SignUp2()
             }
         }
     }
