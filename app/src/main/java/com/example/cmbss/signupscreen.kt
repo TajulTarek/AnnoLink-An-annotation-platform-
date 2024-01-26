@@ -108,6 +108,7 @@ fun signup(signUpCallBack: SignUpCallBack) {
                         focusedBorderColor = Primary,
                         focusedLabelColor = Primary,
                         cursorColor = Primary,
+                        textColor = Color.Black
                     ),
                     placeholder = { Text(text = "Name") },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
@@ -122,6 +123,7 @@ fun signup(signUpCallBack: SignUpCallBack) {
                     },
                     shape = RoundedCornerShape(16.dp)
 
+
                 )
 
                 Spacer(modifier = Modifier.padding(10.dp))
@@ -134,6 +136,7 @@ fun signup(signUpCallBack: SignUpCallBack) {
                         focusedBorderColor = Primary,
                         focusedLabelColor = Primary,
                         cursorColor = Primary,
+                        textColor = Color.Black
                     ),
                     placeholder = { Text(text = "Email") },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
@@ -154,6 +157,12 @@ fun signup(signUpCallBack: SignUpCallBack) {
 
                 OutlinedTextField(
                     label = { Text(text = "Password") },
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = Primary,
+                        focusedLabelColor = Primary,
+                        cursorColor = Primary,
+                        textColor = Color.Black
+                    ),
                     placeholder = { Text(text = "Password") },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),

@@ -72,7 +72,7 @@ import com.google.firebase.auth.auth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignUp2() {
+fun SignUp2(signUp2CallBack: SignUp2CallBack,email:String,password:String,fullname:String) {
     val colorWhite = colorResource(id = R.color.white)
     val bgcolor = Color(0xFF3EA7D7)
     val logincolor = Color(0xFF101361)
@@ -115,7 +115,7 @@ fun SignUp2() {
         LazyColumn(horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .align(Alignment.Center)
-                .padding(20.dp)
+                .padding(start=20.dp,end=20.dp)
 
         ) {
             item {
@@ -142,7 +142,7 @@ fun SignUp2() {
                     )
                 }
                 Spacer(modifier = Modifier.padding(10.dp))
-                textfield(ondisplay = "Enter Fullname", value = nameValue,placeholder="Name")
+                //textfield(ondisplay = "Enter Fullname", value = nameValue,placeholder="Name")
                 textfield(ondisplay = "Enter University Name", value = uniName, placeholder = "University")
                 textfield(ondisplay = "Enter Your ID", value = studentId, placeholder = "your Id")
                 OutlinedTextField(
@@ -244,22 +244,26 @@ fun SignUp2() {
                 Spacer(modifier = Modifier.padding(10.dp))
                 textfield(ondisplay = "Enter Github Link", value = githubLink, placeholder = "github")
                 textfield(ondisplay = "Enter linkedin Link", value = linkedinLink, placeholder = "linkedin")
-
+                Spacer(modifier = Modifier.padding(10.dp))
                 Button(onClick = {
+                    signUp2CallBack.OnCreate(email,password,fullname,
+                        uniName.value,studentId.value,phoneValue.value,
+                        selectedSubject,currentSem,githubLink.value,linkedinLink.value)
 
                 }, modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 50.dp),
-                    shape = RoundedCornerShape(5.dp)
-                ) {
+                    .heightIn(min = 50.dp)) {
                     Text(text = "Create",
                         style = TextStyle(
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Medium,
                             fontStyle = FontStyle.Normal,
-                            letterSpacing = 1.sp,
+                            letterSpacing = 1.sp
                         ))
                 }
+
+                Spacer(modifier = Modifier.padding(20.dp))
+
             }
 
         }
@@ -268,7 +272,7 @@ fun SignUp2() {
 @Composable
 @Preview
 fun signpre(){
-    SignUp2()
+    //SignUp2()
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -298,7 +302,8 @@ fun textfield(ondisplay:String,value: MutableState<String>,placeholder: String){
                 tint = Color.Black
             )
         },*/
-        textStyle = LocalTextStyle.current.copy(color = Color.Black)
+        textStyle = LocalTextStyle.current.copy(color = Color.Black),
+        shape = RoundedCornerShape(16.dp)
 
     )
     Spacer(modifier = Modifier.padding(10.dp))

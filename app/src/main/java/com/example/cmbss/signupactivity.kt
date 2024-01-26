@@ -122,7 +122,12 @@ class signupactivity : ComponentActivity() , SignUpCallBack {
         startActivity(intent)
     }
     override fun OnSignUp(fullname: String, email: String, password: String) {
-        createAccount(fullname,email,password)
+        val intent= Intent(this@signupactivity,SignUpActivity2::class.java)
+        intent.putExtra("email",email)
+        intent.putExtra("password",password)
+        intent.putExtra("fullname",fullname)
+        startActivity(intent)
+        //createAccount(fullname,email,password)
 
     }
 }
