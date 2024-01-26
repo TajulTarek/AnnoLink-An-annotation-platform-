@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "328715617771",
+    "project_id": "cmbss2",
+    "storage_bucket": "cmbss2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:328715617771:android:1484686b3061e1429905ae",
+        "android_client_info": {
+          "package_name": "com.example.cmbss"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "328715617771-kbk4p87481116k31gqbh3n2u9ge64ehs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.cmbss",
+            "certificate_hash": "28eecb49b1829f69703964e094ba9f6498992102"
+          }
+        },
+        {
+          "client_id": "328715617771-agft0tgg6tim9dcls9vaavg7nr7bupc8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDxtn-V4qrVepDB_X66joj7JwiVLXpPvRo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "328715617771-agft0tgg6tim9dcls9vaavg7nr7bupc8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
