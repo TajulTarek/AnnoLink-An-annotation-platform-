@@ -28,12 +28,18 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PostAdd
+import androidx.compose.material.icons.filled.ReportGmailerrorred
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
@@ -68,6 +74,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
@@ -102,6 +110,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.android.material.search.SearchBar
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -112,6 +121,13 @@ import kotlin.random.Random
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun studentHome (studentHomeCallBack: StudentHomeCallBack) {
+    var query by remember { mutableStateOf("") }
+    var active by remember { mutableStateOf(false) }
+    val searchHistory = listOf("Android", "Kotlin", "Compose",
+        "Material Design", "GPT-4"
+    )
+    val bgcolor = Color(0xFF3EA7D7)
+    var searchQuery by rememberSaveable { mutableStateOf("") }
     val db= Firebase.firestore
     var showMenu by remember{
         mutableStateOf(false);
@@ -174,66 +190,163 @@ fun studentHome (studentHomeCallBack: StudentHomeCallBack) {
                     .fillMaxSize(),
                 containerColor = Color.White,
                 topBar = {
-                    Row(
-                        modifier = Modifier
-                            //.border(0.5.dp, Color.Gray)
-                            .fillMaxWidth()
-                            .height(80.dp)
-                    ) {
-                        Box(
+                    Column(){
+                        Row(
                             modifier = Modifier
-                                .size(56.dp)
-                                .clip(CircleShape)
-                                .background(Color.White)
-                                .padding(start = 10.dp)
-                                .align(Alignment.CenterVertically)// Add some padding for a border effect
+                                //.border(0.5.dp, Color.Gray)
+                                .fillMaxWidth()
                         ) {
-                            // Replace the placeholder image with the actual user profile photo
-                            Image(
-                                painter = painterResource(id = R.drawable.person_icon),
-                                contentDescription = null,
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
+                            Box(
+                                modifier = Modifier
+                                    .size(56.dp)
+                                    .clip(CircleShape)
+                                    .background(Color.White)
+                                    .padding(start = 10.dp)
+                                    .align(Alignment.CenterVertically)// Add some padding for a border effect
+                            ) {
+                                // Replace the placeholder image with the actual user profile photo
+                                Image(
+                                    painter = painterResource(id = R.drawable.person_icon),
+                                    contentDescription = null,
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
 
-                            )
-                        }
-
-                        IconButton(
-                            onClick = { studentHomeCallBack.OnSignOut() },
-                            modifier = Modifier.padding(start = 150.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Logout,
-                                contentDescription = "Logout",
-                                modifier=Modifier.size(60.dp)
-                            )
-                        }
-                        IconButton(
-                            onClick = { studentHomeCallBack.OnAddPost() }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Add,
-                                contentDescription = "Add Post",
-                                modifier=Modifier.size(60.dp)
-                            )
-                        }
-                        IconButton(onClick = {
-                            showMenu =! showMenu
-                        }) {
-                            Icon(imageVector = Icons.Filled.Menu,
-                                contentDescription = "menu Icon")
-                            DropdownMenu(
-                                expanded = showMenu, onDismissRequest = { showMenu=false }) {
-                                DropdownMenuItem(text = { Text("Profile") }, onClick = { /*TODO*/ })
+                                )
                             }
-                        }
 
+                            /*IconButton(
+                                onClick = { studentHomeCallBack.OnSignOut() },
+                                modifier = Modifier.padding(start = 150.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Logout,
+                                    contentDescription = "Logout",
+                                    modifier=Modifier.size(60.dp)
+                                )
+                            }*/
+                            IconButton(
+                                onClick = { studentHomeCallBack.OnAddPost()},
+                                modifier = Modifier.padding(start = 150.dp,top=10.dp)
+
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Notifications,
+                                    contentDescription = "Notifications",
+                                    modifier=Modifier.size(30.dp),
+                                    tint=Color.Black
+                                )
+                            }
+                            IconButton(
+                                onClick = { studentHomeCallBack.OnAddPost() },
+                                modifier = Modifier.padding(top=10.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Add,
+                                    contentDescription = "Add Post",
+                                    modifier=Modifier.size(30.dp),
+                                    tint=Color.Black
+                                )
+                            }
+                            IconButton(onClick = {
+                                showMenu =! showMenu
+                            },
+                                modifier = Modifier.padding(top=10.dp)
+                            ) {
+                                Icon(imageVector = Icons.Filled.Menu,
+                                    contentDescription = "menu Icon",
+                                    tint=Color.Black)
+                                DropdownMenu(modifier=Modifier.background(bgcolor),
+                                    expanded = showMenu, onDismissRequest = { showMenu=false }) {
+                                    DropdownMenuItem(text = { Text("Profile") }
+                                        , onClick = { /*TODO*/ },
+                                        leadingIcon = {
+                                            Icon(imageVector = Icons.Filled.Person, contentDescription = "Profile Icon")
+                                        }
+                                    )
+                                    Divider()
+                                    DropdownMenuItem(text = { Text("My Posts") },
+                                        onClick = { /*TODO*/ },
+                                        leadingIcon = {
+                                            Icon(imageVector = Icons.Filled.PostAdd, contentDescription = "")
+                                        }
+                                    )
+                                    Divider()
+                                    DropdownMenuItem(text = { Text("About Us") },
+                                        onClick = { /*TODO*/ },
+                                        leadingIcon = {
+                                            Icon(imageVector = Icons.Filled.ReportGmailerrorred, contentDescription = "")
+                                        }
+                                    )
+                                    Divider()
+                                    DropdownMenuItem(text = { Text("Share") },
+                                        onClick = {  },
+                                        leadingIcon = {
+                                            Icon(imageVector = Icons.Filled.Share, contentDescription = "")
+                                        }
+                                    )
+                                    Divider()
+                                    DropdownMenuItem(text = { Text("Logout") },
+                                        onClick = { studentHomeCallBack.OnSignOut() },
+                                        leadingIcon = {
+                                            Icon(imageVector = Icons.Filled.Logout, contentDescription = "")
+                                        }
+                                    )
+
+                                }//End drop menu
+
+                            }
+
+
+
+                        }
+                        TextField(
+                            value = searchQuery,
+                            onValueChange = { searchQuery = it },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 16.dp, end = 16.dp),
+                            label = { Text("Search") },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Filled.Search,
+                                    contentDescription = "Search Icon",
+                                    tint = Color.Black
+                                )
+                            },
+                            trailingIcon={
+                                Icon(
+                                    imageVector = Icons.Default.Mic,
+                                    contentDescription = "",
+                                    tint=Color.Black
+                                )
+                                if(searchQuery.isNotEmpty()){
+                                    Icon(
+                                    imageVector = Icons.Default.Mic,
+                                    contentDescription = "",
+                                    tint=Color.Black
+                                    )
+                                }
+                            },
+                            keyboardOptions = KeyboardOptions.Default.copy(
+                                imeAction = ImeAction.Search,
+                                keyboardType = KeyboardType.Text
+                            ),
+                            textStyle = TextStyle.Default.copy(fontSize = 16.sp),
+                            singleLine = true,
+                            maxLines = 1,
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                focusedBorderColor = Color.Black,
+                                focusedLabelColor = Color.Black,
+                                cursorColor = Color.Black,
+                                textColor = Color.Black
+                            ))
 
                     }
 
                 },
 
             ) { values ->
+
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()

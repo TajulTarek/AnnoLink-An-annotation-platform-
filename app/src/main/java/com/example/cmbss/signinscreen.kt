@@ -131,6 +131,7 @@ fun signin(signInCallBack: SignInCallBack) {
                         focusedBorderColor = Primary,
                         focusedLabelColor = Primary,
                         cursorColor = Primary,
+                        textColor = Color.Black
                     ),
                     placeholder = { Text(text = "Email") },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
@@ -175,6 +176,12 @@ fun signin(signInCallBack: SignInCallBack) {
                         }
                     },
                     shape = RoundedCornerShape(16.dp),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = Primary,
+                        focusedLabelColor = Primary,
+                        cursorColor = Primary,
+                        textColor = Color.Black
+                    ),
                     visualTransformation = if (passwordVisibility.value) VisualTransformation.None
                     else PasswordVisualTransformation()
 
