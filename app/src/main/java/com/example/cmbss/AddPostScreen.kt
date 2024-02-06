@@ -48,27 +48,36 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddPostScreen(addPostCallBack: AddPostCallBack) {
-
+    val calendar=Calendar.getInstance().time
+    val dateFormat = SimpleDateFormat("HH:mm:ss dd:MM:yyyy", Locale.getDefault())
+    //var tim= DateFormat.getTimeInstance(DateFormat.SHORT).format(calendar)
+    var datetime="datetime"
     val c=Calendar.getInstance()
     val year=c.get(Calendar.YEAR)
     val month=c.get(Calendar.MONTH)
-
     val day=c.get(Calendar.DAY_OF_MONTH)
     val context= LocalContext.current
-    var date by remember{
+    var deadline by remember{
         mutableStateOf("  dd - mm - yy")
     }
     val datepicker=DatePickerDialog(
         context,{ d,year1,month1,day1->
             val month=month1+1
-            date="  $day1 - $month - $year1"
+            val finalday=String.format("%02d",day1)
+            val finalmonth=String.format("%02d",month)
+            deadline="$finalday:$finalmonth:$year1"
         },year,month,day
     )
+
     var title by remember { mutableStateOf("") }
     var username by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
@@ -139,7 +148,7 @@ fun AddPostScreen(addPostCallBack: AddPostCallBack) {
                     .clickable {
                         datepicker.show()
                     }){
-                    Text(modifier=Modifier.padding(top=10.dp),text=date)
+                    Text(modifier=Modifier.padding(top=10.dp),text=deadline)
                 }
 
                 Spacer(modifier = Modifier.padding(10.dp))
@@ -224,7 +233,9 @@ fun AddPostScreen(addPostCallBack: AddPostCallBack) {
 
                 Spacer(modifier = Modifier.padding(20.dp))
 
-                Button(onClick = { addPostCallBack.OnPost(title,date,description,salary,qualifications) }, modifier = Modifier
+                Button(onClick = {
+                    val postedTime = dateFormat.format(android.icu.util.Calendar.getInstance().time)
+                    addPostCallBack.OnPost(title,deadline,description,salary,qualifications,postedTime) }, modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 50.dp)) {
                     Text(text = "Post",

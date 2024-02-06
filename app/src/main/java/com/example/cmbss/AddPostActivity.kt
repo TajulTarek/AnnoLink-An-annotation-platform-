@@ -32,13 +32,13 @@ class AddPostActivity : AppCompatActivity() , AddPostCallBack {
         }
     }
 
-    override fun OnPost(title: String,date:String,description:String,salary:String,qualifications:String) {
-        sentfirebase(title,date,description,salary,qualifications)
+    override fun OnPost(title: String,deadline:String,description:String,salary:String,qualifications:String,time:String) {
+        sentfirebase(title,deadline,description,salary,qualifications,time)
         val intent= Intent(this@AddPostActivity,studenthomeActivity::class.java)
         startActivity(intent)
     }
 
-    fun sentfirebase(title: String,date:String,description:String,salary:String,qualifications:String){
+    fun sentfirebase(title: String,deadline:String,description:String,salary:String,qualifications:String,time:String){
 
         val allpostCollection = FirebaseFirestore.getInstance().collection("posts")
         val r= Random.nextInt()
@@ -47,10 +47,11 @@ class AddPostActivity : AppCompatActivity() , AddPostCallBack {
         val postData = hashMapOf(
             "email" to email,
             "title" to title,
-            "deadline" to date,
+            "deadline" to deadline,
             "description" to description,
             "salary" to salary,
-            "qualification" to qualifications
+            "qualification" to qualifications,
+            "time" to time
         )
         val postID = hashMapOf(
             "postId" to EventId

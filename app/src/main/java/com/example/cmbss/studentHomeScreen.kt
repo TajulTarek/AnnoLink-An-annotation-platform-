@@ -1,38 +1,28 @@
 package com.example.cmbss
 
-import android.content.ContentValues
-import android.util.Log
+import android.icu.util.Calendar
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Face
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Mic
@@ -41,86 +31,62 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PostAdd
 import androidx.compose.material.icons.filled.ReportGmailerrorred
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.AccountCircle
-import androidx.compose.material.icons.outlined.Email
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.NotificationsNone
-import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
 import androidx.compose.material3.Divider
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.android.material.search.SearchBar
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
-import kotlinx.coroutines.launch
-import kotlin.random.Random
+import java.text.DateFormat
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun studentHome (studentHomeCallBack: StudentHomeCallBack) {
+    var isAvailable=false
+
+    val dateFormat = SimpleDateFormat("HH:mm:ss dd:MM:yyyy", Locale.getDefault())
+    val currentDateTime = dateFormat.format(Calendar.getInstance().time)
+    val calendar=Calendar.getInstance().time
+
     var query by remember { mutableStateOf("") }
     var active by remember { mutableStateOf(false) }
     val searchHistory = listOf("Android", "Kotlin", "Compose",
@@ -155,12 +121,38 @@ fun studentHome (studentHomeCallBack: StudentHomeCallBack) {
                 for (document in temp) {
                     // Access each document's data and add it to the list
                     if(document!=null){
-                        val postId=document.getString("id")?:""
+                        val postId=document.id
+                        val poster_Email=document.getString("email")?:""
                         val jobtitle = document.getString("title")?:""
                         val jobdescription=document.getString("description")?:""
+                        val qualification=document.getString("qualification")?:""
+                        val salary=document.getString("salary")?:""
+                        val time=document.getString("time")?:""
+                        val deadline=document.getString("deadline")?:""
+                        val timeFormat = SimpleDateFormat("HH:mm:ss")
+                        var postedTime = dateFormat.parse(time)
 
-                        joblist+=JobPost(postId,jobtitle,jobdescription)
-                        println("xxxxxxxxx $postId")
+                        try {
+                            var postedTime = dateFormat.parse(time)
+                            println(time)
+                            val currentdateTime = dateFormat.parse(currentDateTime)
+                            // Compare the datetimes
+                            when {
+                                postedTime.before(currentdateTime) -> {
+                                    isAvailable=true
+                                }
+                                else -> {
+                                    isAvailable=false
+                                }
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                        val justpostedTime = timeFormat.format(postedTime)
+
+
+                        joblist+=JobPost(postId,jobtitle,jobdescription,poster_Email,justpostedTime,salary,qualification,deadline,isAvailable)
+                        //println("xxxxxxxxx $postId")
 
                     }
                 }
@@ -224,6 +216,8 @@ fun studentHome (studentHomeCallBack: StudentHomeCallBack) {
                                     modifier=Modifier.size(60.dp)
                                 )
                             }*/
+
+                            //Text("$timeFormat")
                             IconButton(
                                 onClick = { studentHomeCallBack.OnAddPost()},
                                 modifier = Modifier.padding(start = 150.dp,top=10.dp)
@@ -357,7 +351,13 @@ fun studentHome (studentHomeCallBack: StudentHomeCallBack) {
                             modifier=Modifier,
                             it.id,
                             it.title,
-                            it.description
+                            it.description,
+                            it.poster_Email,
+                            it.time,
+                            it.salary,
+                            it.qualification,
+                            it.deadline,
+                            it.isAvailable
                         )
                     }
                 }
@@ -371,8 +371,14 @@ fun studentHome (studentHomeCallBack: StudentHomeCallBack) {
 fun ColumnItem(studentHomeCallBack: StudentHomeCallBack,
     modifier: Modifier,
     id:String,
-    titles: String,
-    descriptions: String
+    title: String,
+    descriptions: String,
+    poster_Email: String,
+    time:String,
+    salary:String,
+    qualification:String,
+    deadline:String,
+    isAvailable:Boolean
 ) {
     Card(
         modifier
@@ -386,20 +392,121 @@ fun ColumnItem(studentHomeCallBack: StudentHomeCallBack,
         ),
         elevation = CardDefaults.cardElevation(10.dp)
     ) {
-        Row(
-            modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.Top,
-            horizontalArrangement = Arrangement.spacedBy(15.dp)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         ) {
+            // Top Row
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                // Person icon and name
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Person,
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = poster_Email,
+                        style = TextStyle(
+                            color = Color.Black,
+                            fontSize = 14.sp,
+                            lineHeight = 20.sp,
+                            fontFamily = FontFamily.Serif
+                        ),
+                        modifier = Modifier
+                            .padding(end = 8.dp)
+                            .clickable { }
+                    )
+                }
 
-            Column(modifier.padding(12.dp)) {
-                Text(text = titles, fontSize = 24.sp, fontWeight = FontWeight.Bold,color=Color.Black)
-                Text(text = descriptions, fontSize = 18.sp,color=Color.Black)
+                // Time icon and time ago
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Schedule,
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = time,
+                        style = TextStyle(
+                            color = Color.Black,
+                            fontSize = 14.sp,
+                            lineHeight = 20.sp,
+                            fontStyle = FontStyle.Italic
+                        )
+                    )
+                    val availabilityIcon = if (isAvailable) {
+                        Icons.Default.CheckCircle
+                    } else {
+                        Icons.Default.Close
+                    }
 
+                    /*Icon(
+                        imageVector = availabilityIcon,
+                        contentDescription = null,
+                        tint = if (true) Color.Green else Color.Red,
+                        modifier = Modifier.size(24.dp)
+                    )*/
+
+                }
+            }
+
+            // Job Title
+            Text(
+                text = title,
+                style = TextStyle(
+                    color = Color.Black,
+                    fontSize = 18.sp,
+                    lineHeight = 26.sp,
+                    fontFamily = FontFamily.SansSerif
+                ),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier
+                    .padding(vertical = 8.dp)
+                    .fillMaxWidth()
+            )
+
+            // Availability Icon
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                val availabilityIcon = if (isAvailable) {
+                    Icons.Default.CheckCircle
+                } else {
+                    Icons.Default.Close
+                }
+
+
+                // Spacer
+                Spacer(modifier = Modifier.width(4.dp))
+
+                // Availability Text
+                Text(
+                    text = if (isAvailable) "Available" else "Not Available",
+                    color = if (isAvailable) Color.Green else Color.Red
+                )
             }
         }
     }
+
 }
+
 
 data class DrawerItems(
     val icon : ImageVector,
@@ -411,7 +518,13 @@ data class DrawerItems(
 data class JobPost(
     val id:String,
     val title: String,
-    val description: String
+    val description: String,
+    val poster_Email: String,
+    val time:String,
+    val salary:String,
+    val qualification:String,
+    val deadline:String,
+    val isAvailable: Boolean
 )
 @Composable
 fun profile(){
