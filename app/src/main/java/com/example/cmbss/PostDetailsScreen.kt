@@ -14,11 +14,14 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -39,8 +42,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -56,7 +61,9 @@ import com.google.firebase.firestore.firestore
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PostDetails(postId:String){
+fun PostDetails(postDetailsCallBack: PostDetailsCallBack,postId:String,title:String,
+                description:String,deadline:String,salary:String,fullname:String,qualification:String){
+    val bgcolor = Color(0xFF3EA7D7)
     val db = Firebase.firestore
     val collectionRef = db.collection("posts")
     val documentRef = collectionRef.document(postId)
@@ -66,6 +73,7 @@ fun PostDetails(postId:String){
     var description by remember {
         mutableStateOf("")
     }
+
     documentRef.get()
         .addOnSuccessListener { document ->
             if (document.exists()) {
@@ -87,71 +95,139 @@ fun PostDetails(postId:String){
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = sky)
+            .background(color = Color.White)
+            .padding(10.dp)
     ) {
         Icon(imageVector = Icons.Filled.ArrowBack,
             contentDescription = "d",
             tint=Color.Black,
-            modifier = Modifier.clickable {
-
-            }
-                .padding(10.dp)
-                .size(30.dp))
-
-        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 770.dp) //total height=850dp
-                .align(Alignment.BottomCenter)
-                .background(
-                    Color.White,
-                    shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp)
-                )
-        ){
-            Column(horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(20.dp)){
-                Text(
-                    text = title,
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    style = TextStyle(
-                        fontSize = 30.sp,
-                        fontWeight = FontWeight.Bold,
-                        fontStyle = FontStyle.Normal,
-                        letterSpacing = 1.sp
-                    ),
-                    color = Color.Black,
-                    textAlign = TextAlign.Center
-                )
+                .clickable {
 
-                Text(text=description,
-                    modifier = Modifier
-                        .padding(20.dp)
-                        .clickable {
-                            //signInCallBack.OnForgetPassword()
-                        }
-                )
+                }
+                .size(25.dp))
 
-                Spacer(modifier = Modifier.padding(20.dp))
-
-                Button(onClick = {
-
-                    }, modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 50.dp),
-                    shape = RoundedCornerShape(5.dp)
-                ) {
-                    Text(text = "Apply",
+            LazyColumn(//horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(10.dp)){
+                item {
+                    Text(
+                        text = "Job Details",
+                        modifier = Modifier
+                            .padding(start = 110.dp)
+                            .clickable { //signInCallBack.OnForgetPassword()
+                            },
                         style = TextStyle(
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Medium,
+                            fontWeight = FontWeight.Bold,
                             fontStyle = FontStyle.Normal,
-                            letterSpacing = 1.sp,
-                        ))
+                            letterSpacing = 1.sp
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    Text(
+                        text = title,
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        style = TextStyle(
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontStyle = FontStyle.Normal,
+                            fontFamily = FontFamily.Serif,
+                            letterSpacing = 1.sp
+                        ),
+                        color = Color.Black
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = description,
+                        modifier = Modifier,
+                        style = TextStyle(
+                            fontFamily = FontFamily.SansSerif,
+                            fontSize = 16.sp,
+                            color = Color.Black,
+                            fontWeight = FontWeight.W400,
+                            lineHeight = 24.sp,
+                            letterSpacing = 1.sp
+                        ),
+                        maxLines = 20
+                    )
+
+                    Spacer(modifier = Modifier.padding(10.dp))
+                    Text(
+                        text = "Deadline",
+                        style = TextStyle(
+                            fontSize = 18.sp,
+                            color = Color.Black,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = deadline,
+                        style = TextStyle(
+                            fontSize = 14.sp,
+                            color = Color.Gray
+                        )
+                    )
+                    Spacer(modifier = Modifier.padding(10.dp))
+                    Text(
+                        text = "Salary",
+                        style = TextStyle(
+                            fontSize = 18.sp,
+                            color = Color.Black,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = salary,
+                        style = TextStyle(
+                            fontSize = 14.sp,
+                            color = Color.Gray
+                        )
+                    )
+                    Spacer(modifier = Modifier.padding(10.dp))
+                    Text(
+                        text = "Posted By",
+                        style = TextStyle(
+                            fontSize = 18.sp,
+                            color = Color.Black,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = fullname,
+                        style = TextStyle(
+                            fontSize = 14.sp,
+                            color = Color.Gray
+                        )
+                    )
+                    Spacer(modifier = Modifier.padding(10.dp))
+
+
+                    Button(
+                        onClick = {
+                            postDetailsCallBack.OnApply()
+                        }, modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 50.dp),
+                        shape = RoundedCornerShape(5.dp),
+                        colors = ButtonDefaults.buttonColors(bgcolor)
+                    ) {
+                        Text(
+                            text = "Apply",
+                            style = TextStyle(
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Medium,
+                                fontStyle = FontStyle.Normal,
+                                letterSpacing = 1.sp,
+                            )
+                        )
+                    }
+
                 }
 
-
-            }
 
         }
 

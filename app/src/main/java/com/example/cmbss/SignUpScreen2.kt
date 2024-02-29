@@ -69,10 +69,14 @@ import androidx.compose.ui.unit.toSize
 import com.example.cmbss.ui.theme.Primary
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUp2(signUp2CallBack: SignUp2CallBack,email:String,password:String,fullname:String) {
+
     val colorWhite = colorResource(id = R.color.white)
     val bgcolor = Color(0xFF3EA7D7)
     val logincolor = Color(0xFF101361)
@@ -107,7 +111,6 @@ fun SignUp2(signUp2CallBack: SignUp2CallBack,email:String,password:String,fullna
             contract = ActivityResultContracts.PickVisualMedia(),
             onResult = { uri ->
                 selectedImageUri = uri
-                //upload(selectedImageUri)
                 photoselect="Selected"
 
             }
@@ -248,7 +251,7 @@ fun SignUp2(signUp2CallBack: SignUp2CallBack,email:String,password:String,fullna
                 Button(onClick = {
                     signUp2CallBack.OnCreate(email,password,fullname,
                         uniName.value,studentId.value,phoneValue.value,
-                        selectedSubject,currentSem,githubLink.value,linkedinLink.value)
+                        selectedSubject,currentSem,githubLink.value,linkedinLink.value,selectedImageUri)
 
                 }, modifier = Modifier
                     .fillMaxWidth()

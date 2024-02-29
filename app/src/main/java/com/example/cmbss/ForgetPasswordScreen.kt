@@ -154,9 +154,6 @@ fun ForgetPassword() {
                         ))
                 }
 
-
-
-
             }
 
         }

@@ -2,6 +2,7 @@ package com.example.cmbss
 
 import android.content.ContentValues
 import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -13,6 +14,9 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import java.util.UUID
 
 class SignUpActivity2 : AppCompatActivity() ,SignUp2CallBack{
     private lateinit var email:String
@@ -23,6 +27,10 @@ class SignUpActivity2 : AppCompatActivity() ,SignUp2CallBack{
     val db = Firebase.firestore
     private lateinit var auth: FirebaseAuth
     val signUp2CallBack:SignUp2CallBack=this
+    val filename = "${UUID.randomUUID()}.jpg"
+
+    // Get a reference to the Firebase Storage location
+    val storageReference: StorageReference = FirebaseStorage.getInstance().getReference("images/$filename")
     override fun onCreate(savedInstanceState: Bundle?) {
         receivedIntent=intent
         email=(receivedIntent.getSerializableExtra("email")as?String)!!
@@ -36,15 +44,15 @@ class SignUpActivity2 : AppCompatActivity() ,SignUp2CallBack{
     }
     override fun OnCreate(email: String,password: String,fullname: String,uniName:String,
                           studentId:String,phone:String,department:String,
-                          semester:String, github:String,linkedin:String) {
+                          semester:String, github:String,linkedin:String,selectedImageUri: Uri?) {
 
         createAccount(email,password,fullname,
             uniName,studentId,phone,
-            department,semester,github,linkedin)
+            department,semester,github,linkedin,selectedImageUri)
     }
     fun createAccount(email: String,password: String,fullname: String,uniName:String,
                       studentId:String,phone:String,deptartment:String,
-                      semester:String, github:String,linkedin:String) {
+                      semester:String, github:String,linkedin:String,selectedImageUri: Uri?) {
         // [START create_user_with_email]
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
@@ -53,11 +61,21 @@ class SignUpActivity2 : AppCompatActivity() ,SignUp2CallBack{
                     Log.d(ContentValues.TAG, "createUserWithEmail:success")
                     val user = auth.currentUser
                     var userId = user?.uid
-                    //updateUI(user)
-                    storestudent(userId,email,password,fullname,uniName,
-                        studentId, phone, deptartment, semester, github, linkedin)
-                    val intent= Intent(this@SignUpActivity2,studenthomeActivity::class.java)
-                    startActivity(intent)
+                    if (selectedImageUri != null) {
+                        storageReference.putFile(selectedImageUri)
+                            .addOnSuccessListener {
+                                storageReference.downloadUrl.addOnSuccessListener { uri ->
+                                    val downloadUrl = uri.toString()
+                                    storestudent(userId,email,password,fullname,uniName,
+                                        studentId, phone, deptartment, semester, github, linkedin,downloadUrl)
+                                    val intent= Intent(this@SignUpActivity2,studenthomeActivity::class.java)
+                                    startActivity(intent)
+                                }
+                            }
+                            .addOnFailureListener {
+                            }
+                    }
+
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(ContentValues.TAG, "createUserWithEmail:failure", task.exception)
@@ -75,7 +93,7 @@ class SignUpActivity2 : AppCompatActivity() ,SignUp2CallBack{
 
     fun storestudent(userId: String?, email: String, password: String,fullname: String,
                      uniName: String,studentId: String,phone: String,deptartment: String,
-                     semester: String,github: String,linkedin: String){
+                     semester: String,github: String,linkedin: String,downloadUrl:String){
         /*val newuser = hashMapOf(
             "fullname" to fullname,
             "email" to email,
@@ -112,7 +130,8 @@ class SignUpActivity2 : AppCompatActivity() ,SignUp2CallBack{
             "deptartment" to deptartment,
             "semester" to semester,
             "github" to github,
-            "linkedin" to linkedin
+            "linkedin" to linkedin,
+            "dp" to downloadUrl
         )
 
         // Set the data to the document

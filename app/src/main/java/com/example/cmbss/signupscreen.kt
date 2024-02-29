@@ -68,7 +68,7 @@ fun signup(signUpCallBack: SignUpCallBack) {
         contentAlignment = Alignment.TopCenter
     ) {
         Image(
-            painter = painterResource(id = R.mipmap.dp_foreground),
+            painter = painterResource(id = R.drawable.signupphoto),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.size(150.dp)

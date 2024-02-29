@@ -153,11 +153,7 @@ fun AddPostScreen(addPostCallBack: AddPostCallBack) {
 
                 Spacer(modifier = Modifier.padding(10.dp))
 
-                /*Button(onClick = { datepicker.show() },modifier=Modifier.width(150.dp)) {
-                    Text("Deadline")
-                }*/
-                //Spacer(modifier = Modifier.padding(5.dp))
-                            OutlinedTextField(
+                    OutlinedTextField(
                     label = { Text(text = "Description") },
                     placeholder = { Text(text = "Description") },
                     modifier = Modifier

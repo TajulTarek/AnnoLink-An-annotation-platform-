@@ -27,10 +27,7 @@ class studenthomeActivity : ComponentActivity() ,StudentHomeCallBack{
 
         setContent {
             CmbssTheme {
-                    //HomeScreen()
                     studentHome(studentHomeCallBack)
-                    //MyAccount()
-                    //Myaccount(myAccountCallBack)
 
             }
         }
@@ -41,9 +38,16 @@ class studenthomeActivity : ComponentActivity() ,StudentHomeCallBack{
         startActivity(intent)
     }
 
-    override fun OnPostClick(id:String) {
+    override fun OnPostClick(id:String,title:String,description:String,deadline:String,salary:String,fullname:String,qualification:String) {
         val intent= Intent(this@studenthomeActivity,PostDetailsActivity::class.java)
         intent.putExtra("postId",id)
+        intent.putExtra("title",title)
+        intent.putExtra("description",description)
+        intent.putExtra("deadline",deadline)
+        intent.putExtra("salary",salary)
+        intent.putExtra("fullname",fullname)
+        intent.putExtra("qualification",qualification)
+
         startActivity(intent)
     }
 
@@ -51,31 +55,17 @@ class studenthomeActivity : ComponentActivity() ,StudentHomeCallBack{
         val intent= Intent(this@studenthomeActivity,AddPostActivity::class.java)
         startActivity(intent)
     }
+    override fun OnMyPosts(){
+        val intent= Intent(this@studenthomeActivity,MyPostsActivity::class.java)
+        startActivity(intent)
+    }
 
-    /*fun sentfirebase(title:String,description: String){
-
-// Reference to the Firestore database
-        val db = Firebase.firestore
-
-// Reference to the "posts" collection
-        val postsCollection = db.collection("posts")
-
-// Create a new job post
-        val jobPost = JobPost(
-            title = title,
-            description = description
-        )
-
-// Add the job post to the "posts" collection
-        postsCollection
-            .document("job $") // Assuming "job" is the document ID
-            .set(jobPost)
-            .addOnSuccessListener {
-                // Document added successfully
-            }
-            .addOnFailureListener { e ->
-                // Error adding document
-            }
-    }*/
+    override fun OnMyProfile() {
+        val user=auth.currentUser
+        val Id=user?.uid
+        val intent= Intent(this@studenthomeActivity,MyProfileActivity::class.java)
+        intent.putExtra("Id",Id)
+        startActivity(intent)
+    }
 }
 

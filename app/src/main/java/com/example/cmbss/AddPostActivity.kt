@@ -51,20 +51,12 @@ class AddPostActivity : AppCompatActivity() , AddPostCallBack {
             "description" to description,
             "salary" to salary,
             "qualification" to qualifications,
-            "time" to time
+            "time" to time,
+            "applicants" to emptyList<String>()
         )
         val postID = hashMapOf(
             "postId" to EventId
         )
-
-        /*usersCollection
-            .add(postDocument)
-            .addOnSuccessListener { documentReference ->
-                Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
-            }
-            .addOnFailureListener { e ->
-                Log.w(TAG, "Error adding document", e)
-            }*/
         postDocument.set(postData)
             .addOnSuccessListener {
                 Log.d(ContentValues.TAG, "User information stored successfully")
@@ -77,14 +69,6 @@ class AddPostActivity : AppCompatActivity() , AddPostCallBack {
 
         mypostDocument
             .set(postID)
-            /*.addOnSuccessListener { documentReference ->
-                // Post added successfully
-                //val postId = documentReference.id
-                // You can store the postId in the user's document or use it as needed
-            }
-            .addOnFailureListener { e ->
-                // Handle errors
-            }*/
             .addOnSuccessListener {
                 Log.d(ContentValues.TAG, "User information stored successfully")
             }

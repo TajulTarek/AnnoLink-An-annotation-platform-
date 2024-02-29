@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">cmbss</string>
+    <string name="app_name">Anno Link</string>
     <string name="title_activity_signupactivity">signupactivity</string>
     <string name="title_activity_studenthome">studenthomeActivity</string>
     <string name="title_activity_example">example</string>

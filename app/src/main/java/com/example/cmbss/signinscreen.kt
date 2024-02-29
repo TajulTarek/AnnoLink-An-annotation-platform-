@@ -91,7 +91,7 @@ fun signin(signInCallBack: SignInCallBack) {
         contentAlignment = Alignment.TopCenter
     ) {
         Image(
-            painter = painterResource(id = R.mipmap.dp_foreground),
+            painter = painterResource(id = R.drawable.home_png1),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.size(200.dp)

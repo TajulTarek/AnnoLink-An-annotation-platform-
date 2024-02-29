@@ -6,12 +6,27 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/dp_round"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Cmbss"
         tools:targetApi="31">
+        <activity
+            android:name=".MyProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".OtherProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AllApplicantsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MyPostsCallBack"
+            android:exported="false" />
+        <activity
+            android:name=".MyPostsActivity"
+            android:exported="false" />
         <activity
             android:name=".SignUpActivity2"
             android:exported="false" />
