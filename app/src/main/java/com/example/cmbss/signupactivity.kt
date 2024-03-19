@@ -122,11 +122,21 @@ class signupactivity : ComponentActivity() , SignUpCallBack {
         startActivity(intent)
     }
     override fun OnSignUp(fullname: String, email: String, password: String) {
-        val intent= Intent(this@signupactivity,SignUpActivity2::class.java)
-        intent.putExtra("email",email)
-        intent.putExtra("password",password)
-        intent.putExtra("fullname",fullname)
-        startActivity(intent)
+        val trimedemail=email.trim()
+        if(password.length<6){
+            Toast.makeText(
+                baseContext,
+                "Password must be at least 6 characters long",
+                Toast.LENGTH_SHORT,
+            ).show()
+        }
+        else{
+            val intent= Intent(this@signupactivity,SignUpActivity2::class.java)
+            intent.putExtra("email",trimedemail)
+            intent.putExtra("password",password)
+            intent.putExtra("fullname",fullname)
+            startActivity(intent)
+        }
         //createAccount(fullname,email,password)
 
     }

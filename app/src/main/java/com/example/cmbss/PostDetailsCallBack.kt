@@ -2,5 +2,5 @@ package com.example.cmbss
 
 interface PostDetailsCallBack {
     fun OnBackArrow()
-    fun OnApply()
+    fun OnApply(posterId:String,isAlreadyApplied:Boolean)
 }

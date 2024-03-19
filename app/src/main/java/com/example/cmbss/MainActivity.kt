@@ -58,7 +58,6 @@ class MainActivity : ComponentActivity(), SignInCallBack {
                     updateUI(null)
                 }
             }
-        // [END create_user_with_email]
     }
 
 
@@ -68,7 +67,7 @@ class MainActivity : ComponentActivity(), SignInCallBack {
 
         }
         else {
-            // [START sign_in_with_email]
+
             auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
@@ -90,21 +89,19 @@ class MainActivity : ComponentActivity(), SignInCallBack {
                     }
                 }
         }
-        // [END sign_in_with_email]
     }
     private fun sendEmailVerification() {
-        // [START send_email_verification]
+
         val user = auth.currentUser!!
         user.sendEmailVerification()
             .addOnCompleteListener(this) { task ->
-                // Email Verification sent
+
             }
-        // [END send_email_verification]
+
     }
 
     private fun updateUI(user: FirebaseUser?) {
     }
-
     private fun reload() {
         val intent= Intent(this@MainActivity,studenthomeActivity::class.java)
         startActivity(intent)
@@ -115,7 +112,8 @@ class MainActivity : ComponentActivity(), SignInCallBack {
     }
 
     override fun OnSignIn(email: String,password: String) {
-        signIn(email,password)
+        val t_email=email.trim()
+        signIn(t_email,password)
 
     }
     override fun OnForgetPassword() {

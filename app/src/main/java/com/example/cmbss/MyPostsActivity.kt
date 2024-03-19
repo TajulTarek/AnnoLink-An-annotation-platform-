@@ -30,65 +30,8 @@ class MyPostsActivity : AppCompatActivity(),MyPostsCallBack {
         setContent {
             CmbssTheme {
 
-                var isAvailable by remember { mutableStateOf(false) }
-                var timeago by remember { mutableStateOf("") }
-                val dateFormat = SimpleDateFormat("HH:mm:ss dd:MM:yyyy", Locale.getDefault())
-                val deadlineFormat = SimpleDateFormat("dd:MM:yyyy", Locale.getDefault())
-                val currentDateTime = dateFormat.format(Calendar.getInstance().time)
-                var myPosts by remember {
-                    mutableStateOf<List<Post>>(emptyList())
-                }
-                val currentUser = FirebaseAuth.getInstance().currentUser
-                val uid = currentUser?.uid
-                if (uid != null) {
-                    val myPostCollection = FirebaseFirestore.getInstance().collection("users").document(uid).collection("myPost")
 
-                    LaunchedEffect(uid) {
-                        try {
-                            // Fetch postID documents
-                            val postIDDocuments = myPostCollection.get().await()
-
-                            // Iterate over postIDDocuments and fetch posts
-                            for (document in postIDDocuments) {
-                                val postId = document.getString("postId")
-                                if (postId != null) {
-                                    val postDocument = FirebaseFirestore.getInstance().collection("posts").document(postId).get().await()
-                                    val title=postDocument.getString("title")?:""
-                                    val time=postDocument.getString("time")?:""
-                                    val deadline=postDocument.getString("deadline")?:""
-                                    val timeFormat = SimpleDateFormat("HH:mm")
-                                    var postedTime = dateFormat.parse(time)
-                                    var deadlineTimeFormat= deadlineFormat.parse(deadline)
-                                    val applicantsArray = postDocument.get("applicants") as? List<String>
-                                    val size= applicantsArray?.size
-                                    try {
-
-                                        val currentdateTime = dateFormat.parse(currentDateTime)
-                                        println(currentdateTime)
-                                        timeago= getTimeAgo(postedTime,currentdateTime)
-                                        when {
-                                            deadlineTimeFormat.before(currentdateTime) -> {
-                                                isAvailable=false
-                                            }
-                                            else -> {
-                                                isAvailable=true
-                                            }
-                                        }
-                                    } catch (e: Exception) {
-                                        e.printStackTrace()
-                                    }
-                                    myPosts+=Post(postId,title,timeago,isAvailable, size?:0 )
-                                }
-
-                            }
-                        } catch (e: Exception) {
-
-                            e.printStackTrace()
-                        }
-                    }
-
-                }
-                MyPostScreen(myPostsCallBack,myPosts)
+                MyPostScreen(myPostsCallBack)
             }
         }
     }

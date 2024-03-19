@@ -27,7 +27,7 @@ class AddPostActivity : AppCompatActivity() , AddPostCallBack {
         super.onCreate(savedInstanceState)
         setContent {
             CmbssTheme {
-                AddPostScreen(addPostCallBack)
+                AddPostScreen()
             }
         }
     }

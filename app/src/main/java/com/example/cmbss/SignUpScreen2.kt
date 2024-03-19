@@ -93,6 +93,7 @@ fun SignUp2(signUp2CallBack: SignUp2CallBack,email:String,password:String,fullna
     val confirmPasswordValue = remember { mutableStateOf("") }
     val passwordVisibility = remember { mutableStateOf(false) }
     val confirmPasswordVisibility = remember { mutableStateOf(false) }
+
     val semesters = arrayOf("1st Semester",
         "2nd Semester", "3rd Semester", "4th Semester",
         "5th Semester", "6th Semester", "7th Semester", "8th Semester"
@@ -145,9 +146,8 @@ fun SignUp2(signUp2CallBack: SignUp2CallBack,email:String,password:String,fullna
                     )
                 }
                 Spacer(modifier = Modifier.padding(10.dp))
-                //textfield(ondisplay = "Enter Fullname", value = nameValue,placeholder="Name")
                 textfield(ondisplay = "Enter University Name", value = uniName, placeholder = "University")
-                textfield(ondisplay = "Enter Your ID", value = studentId, placeholder = "your Id")
+                textfield(ondisplay = "Enter Your Student ID", value = studentId, placeholder = "Student Id")
                 OutlinedTextField(
                     modifier = Modifier
                         .fillMaxWidth()

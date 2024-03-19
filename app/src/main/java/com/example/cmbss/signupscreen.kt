@@ -61,6 +61,7 @@ fun signup(signUpCallBack: SignUpCallBack) {
     val confirmPasswordValue = remember { mutableStateOf("") }
     val passwordVisibility = remember { mutableStateOf(false) }
     val confirmPasswordVisibility = remember { mutableStateOf(false) }
+    var passwordError by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -156,7 +157,7 @@ fun signup(signUpCallBack: SignUpCallBack) {
 
 
                 OutlinedTextField(
-                    label = { Text(text = "Password") },
+                    label = { Text(text = if(passwordError)"Password must contain at least 6 characters" else "") },
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         focusedBorderColor = Primary,
                         focusedLabelColor = Primary,
@@ -170,6 +171,7 @@ fun signup(signUpCallBack: SignUpCallBack) {
                     value = passwordValue.value,
                     onValueChange = {
                         passwordValue.value = it
+                        passwordError = passwordValue.value.length < 6
                     },
                     leadingIcon = {
                         Icon(painter = painterResource(id = R.drawable.password_lock), contentDescription ="",

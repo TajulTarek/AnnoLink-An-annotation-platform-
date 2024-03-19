@@ -36,6 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.referentialEqualityPolicy
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -62,6 +63,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun AllApplicantsScreen(allApplicantsCallBack: AllApplicantsCallBack,postId:String){
+
     val bgcolor = Color(0xFF3EA7D7)
     val offwhite= Color(0xfffde4f2)
     var allApplicants by remember { mutableStateOf<List<applicant>>(emptyList()) }
@@ -75,7 +77,6 @@ fun AllApplicantsScreen(allApplicantsCallBack: AllApplicantsCallBack,postId:Stri
             val temp=documentSnapshot
             if (documentSnapshot.exists()) {
                 val applicantsArray = temp.get("applicants") as? List<String>
-                println("uski nakiaa")
                 if (applicantsArray != null) {
                     println("Number of Applicants: ${applicantsArray?.size}")
 
@@ -89,7 +90,6 @@ fun AllApplicantsScreen(allApplicantsCallBack: AllApplicantsCallBack,postId:Stri
                                     val deptartment = userDocumentSnapshot.getString("deptartment")?:""
                                     val semester = userDocumentSnapshot.getString("semester")?:""
                                     val dp = userDocumentSnapshot.getString("dp")?:""
-
                                     allApplicants+=(applicant(applicantUid,userName,deptartment,semester,dp))
 
 
@@ -133,7 +133,6 @@ fun AllApplicantsScreen(allApplicantsCallBack: AllApplicantsCallBack,postId:Stri
                     Spacer(modifier = Modifier.width(8.dp))
 
                 }
-                Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center,
@@ -159,6 +158,7 @@ fun AllApplicantsScreen(allApplicantsCallBack: AllApplicantsCallBack,postId:Stri
                         ColumnItem(
                             modifier = Modifier,
                             id = it.id,
+                            postId=postId,
                             name = it.name,
                             allApplicantsCallBack = allApplicantsCallBack,
                             deptartment = it.deptartment,
@@ -177,6 +177,7 @@ fun AllApplicantsScreen(allApplicantsCallBack: AllApplicantsCallBack,postId:Stri
 fun ColumnItem(
     modifier: Modifier,
     id:String,
+    postId:String,
     name:String,
     allApplicantsCallBack: AllApplicantsCallBack,
     deptartment: String,
@@ -184,8 +185,9 @@ fun ColumnItem(
     dp: String
 
 ) {
-
+    var refreshPage by remember { mutableStateOf(false) }
     val offwhite=Color(0xffe5bdc4)
+    val bgcolor = Color(0xFF3EA7D7)
     val db = Firebase.firestore
     val painter = rememberImagePainter(data = dp, builder = {
         crossfade(true)
@@ -195,7 +197,7 @@ fun ColumnItem(
 
     val scope = rememberCoroutineScope()
     Card(
-        modifier
+        modifier = modifier
             .padding(start = 10.dp, end = 10.dp, top = 4.dp, bottom = 4.dp)
             .wrapContentSize()
             .height(55.dp),
@@ -205,7 +207,6 @@ fun ColumnItem(
         elevation = CardDefaults.cardElevation(2.dp),
         shape = RoundedCornerShape(0.dp)
     ) {
-
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -222,7 +223,8 @@ fun ColumnItem(
                         .background(Color.White)
                         .align(Alignment.CenterVertically)
                 ){
-                    Image(painter = painter,
+                    Image(
+                        painter = painter,
                         contentDescription = "",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
@@ -230,47 +232,77 @@ fun ColumnItem(
                     )
                 }
                 Spacer(modifier = Modifier.width(12.dp))
-                Column {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = name,
-                            color = if (clickEffect) Color.Red else Color(0xFF0D47A1),
-                            modifier=Modifier.clickable {
-                                allApplicantsCallBack.OnOtherProfileClick(id)
-                                scope.launch {
-                                    clickEffect = true
-                                    delay(200)
-                                    clickEffect = false
-                                }
+                Column(
+                    modifier = Modifier
+                        .weight(1f) // Adjust the weight to allow the button to take available space
+                ) {
+                    Text(
+                        text = name,
+                        color = if (clickEffect) Color.Red else Color(0xFF0D47A1),
+                        modifier = Modifier.clickable {
+                            allApplicantsCallBack.OnOtherProfileClick(id)
+                            scope.launch {
+                                clickEffect = true
+                                delay(200)
+                                clickEffect = false
                             }
+                        }
+                    )
+                    Text(
+                        text = "$deptartment - $semester",
+                        style = TextStyle(
+                            color = Color(0xFF4CAF50),
+                            fontSize = 10.sp,
+                            lineHeight = 10.sp,
+                            fontStyle = FontStyle.Italic
                         )
+                    )
+                }
 
-                    }
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                // Accept Button
+                Column(modifier.padding(end=3.dp)) {
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    // Accept Box
+                    Box(
+                        modifier = Modifier
+                            .height(16.dp) // Set the desired height
+                            .clickable {
+                                allApplicantsCallBack.addOnChannel(id,postId)
+                            }
+                            .background(color = bgcolor, RoundedCornerShape(3.dp))
+                            .width(60.dp)
+                            .padding(horizontal = 8.dp)
+                            .align(Alignment.CenterHorizontally)// Set background color for the Accept button
                     ) {
                         Text(
-                            text = "$deptartment - $semester",
-                            style = TextStyle(
-                                color = Color(0xFF4CAF50),
-                                        fontSize = 10.sp,
-                                lineHeight = 10.sp,
-                                fontStyle = FontStyle.Italic
-                            )
+                            text = "Accept",
+                            color = Color.White,
+                            fontSize = 12.sp
                         )
+                    }
+
+                    Spacer(modifier = Modifier.height(5.dp))
+
+                    Box(
+                        modifier = Modifier
+                            .height(16.dp)
+                            .clickable { allApplicantsCallBack.OnReject(id,postId) }
+                            .background(color = Color.Red, RoundedCornerShape(3.dp))
+                            .width(60.dp)
+                            .padding(horizontal = 8.dp)
+                            .align(Alignment.CenterHorizontally)// Set background color for the Reject button
+                    ) {
+                        Text("Reject", color = Color.White, fontSize = 12.sp) // Set text color and size for the Reject button
                     }
                 }
 
 
+
             }
         }
-
-
     }
+
 }
 
 

@@ -62,6 +62,11 @@ class SignUpActivity2 : AppCompatActivity() ,SignUp2CallBack{
                     val user = auth.currentUser
                     var userId = user?.uid
                     if (selectedImageUri != null) {
+                        Toast.makeText(
+                            baseContext,
+                            "Please wait. Your account is creating.. ",
+                            Toast.LENGTH_LONG,
+                        ).show()
                         storageReference.putFile(selectedImageUri)
                             .addOnSuccessListener {
                                 storageReference.downloadUrl.addOnSuccessListener { uri ->
@@ -76,6 +81,7 @@ class SignUpActivity2 : AppCompatActivity() ,SignUp2CallBack{
                             }
                     }
 
+
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(ContentValues.TAG, "createUserWithEmail:failure", task.exception)
@@ -84,9 +90,8 @@ class SignUpActivity2 : AppCompatActivity() ,SignUp2CallBack{
                         "Authentication failed.",
                         Toast.LENGTH_SHORT,
                     ).show()
-                    //updateUI(null)
-                    //BackToSignUp()
                 }
+
             }
         // [END create_user_with_email]
     }
@@ -131,7 +136,9 @@ class SignUpActivity2 : AppCompatActivity() ,SignUp2CallBack{
             "semester" to semester,
             "github" to github,
             "linkedin" to linkedin,
-            "dp" to downloadUrl
+            "dp" to downloadUrl,
+            "total_annotate" to 0.0,
+            "all_Rating" to 0.0
         )
 
         // Set the data to the document

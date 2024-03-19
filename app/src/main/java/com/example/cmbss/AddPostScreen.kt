@@ -56,10 +56,9 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddPostScreen(addPostCallBack: AddPostCallBack) {
+fun AddPostScreen() {
     val calendar=Calendar.getInstance().time
     val dateFormat = SimpleDateFormat("HH:mm:ss dd:MM:yyyy", Locale.getDefault())
-    //var tim= DateFormat.getTimeInstance(DateFormat.SHORT).format(calendar)
     var datetime="datetime"
     val c=Calendar.getInstance()
     val year=c.get(Calendar.YEAR)
@@ -67,7 +66,7 @@ fun AddPostScreen(addPostCallBack: AddPostCallBack) {
     val day=c.get(Calendar.DAY_OF_MONTH)
     val context= LocalContext.current
     var deadline by remember{
-        mutableStateOf("  dd - mm - yy")
+        mutableStateOf("dd - mm - yy")
     }
     val datepicker=DatePickerDialog(
         context,{ d,year1,month1,day1->
@@ -105,7 +104,7 @@ fun AddPostScreen(addPostCallBack: AddPostCallBack) {
                         fontStyle = FontStyle.Normal,
                         letterSpacing = 1.sp
                     ),
-                    color = bgcolor,//colorResource(id = R.color.black),
+                    color = bgcolor,
                     textAlign = TextAlign.Center
                 )
 
@@ -141,8 +140,8 @@ fun AddPostScreen(addPostCallBack: AddPostCallBack) {
                 Spacer(modifier = Modifier.padding(10.dp))
 
                 Box(modifier=Modifier.fillMaxWidth().border(
-                    width = 1.dp, // Border width in dp
-                    color = Color.Black // Border shape (you can customize it)
+                    width = 1.dp,
+                    color = Color.Black
                 )
                     .height(50.dp)
                     .clickable {
@@ -231,7 +230,9 @@ fun AddPostScreen(addPostCallBack: AddPostCallBack) {
 
                 Button(onClick = {
                     val postedTime = dateFormat.format(android.icu.util.Calendar.getInstance().time)
-                    addPostCallBack.OnPost(title,deadline,description,salary,qualifications,postedTime) }, modifier = Modifier
+                    //addPostCallBack.OnPost(title,deadline,description,salary,qualifications,postedTime)
+                    },
+                         modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 50.dp)) {
                     Text(text = "Post",

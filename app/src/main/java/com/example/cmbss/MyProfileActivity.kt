@@ -51,4 +51,11 @@ class MyProfileActivity : AppCompatActivity(),MyProfileCallBack {
             // You can display a user-friendly message here
         }
     }
+
+    override fun OpenChat(currentuserId: String, oppositeId: String) {
+        val intent = Intent(this@MyProfileActivity, SingleChatActivity::class.java)
+        intent.putExtra("currentuserId",currentuserId)
+        intent.putExtra("oppositeId",oppositeId)
+        startActivity(intent)
+    }
 }

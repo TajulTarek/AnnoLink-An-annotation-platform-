@@ -61,73 +61,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 
 @Composable
-fun MyPostScreen(myPostsCallBack: MyPostsCallBack) {
-    var isAvailable by remember { mutableStateOf(false) }
-    var timeago by remember { mutableStateOf("") }
-    val dateFormat = SimpleDateFormat("HH:mm:ss dd:MM:yyyy", Locale.getDefault())
-    val deadlineFormat = SimpleDateFormat("dd:MM:yyyy", Locale.getDefault())
-    val currentDateTime = dateFormat.format(Calendar.getInstance().time)
-    var myPosts by remember {
-        mutableStateOf<List<Post>>(emptyList())
-    }
-    val currentUser = FirebaseAuth.getInstance().currentUser
-    val uid = currentUser?.uid
-    if (uid != null) {
-        val myPostCollection = FirebaseFirestore.getInstance().collection("users").document(uid).collection("myPost")
-
-        LaunchedEffect(uid) {
-            try {
-                // Fetch postID documents
-                val postIDDocuments = myPostCollection.get().await()
-
-                // Iterate over postIDDocuments and fetch posts
-                for (document in postIDDocuments) {
-                    val postId = document.getString("postId")
-                    if (postId != null) {
-                        val postDocument = FirebaseFirestore.getInstance().collection("posts").document(postId).get().await()
-                        val title=postDocument.getString("title")?:""
-                        val time=postDocument.getString("time")?:""
-                        val deadline=postDocument.getString("deadline")?:""
-                        val timeFormat = SimpleDateFormat("HH:mm")
-                        var postedTime = dateFormat.parse(time)
-                        var deadlineTimeFormat= deadlineFormat.parse(deadline)
-                        val applicantsArray = postDocument.get("applicants") as? List<String>
-                        val size= applicantsArray?.size
-                        try {
-
-                            val currentdateTime = dateFormat.parse(currentDateTime)
-                            println(currentdateTime)
-                            timeago= getTimeAgo(postedTime,currentdateTime)
-                            when {
-                                deadlineTimeFormat.before(currentdateTime) -> {
-                                    isAvailable=false
-                                }
-                                else -> {
-                                    isAvailable=true
-                                }
-                            }
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                        myPosts+= Post(postId,title,timeago,isAvailable, size?:0 )
-                    }
-
-                }
-            } catch (e: Exception) {
-
-                e.printStackTrace()
-            }
-        }
-
-    }
+fun MyChannelsScreen(myChannelsCallBack: MyChannelsCallBack,myChannels:List<studenthomeActivity.Channel>) {
     val bgcolor = Color(0xFF3EA7D7)
     val offwhite=Color(0xfffde4f2)
 
@@ -157,7 +95,7 @@ fun MyPostScreen(myPostsCallBack: MyPostsCallBack) {
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     modifier=Modifier.fillMaxWidth(),
-                    text = "My Posts",
+                    text = "My Channels",
                     color = Color.White,
                     fontSize = 24.sp,
                     maxLines = 1,
@@ -171,27 +109,24 @@ fun MyPostScreen(myPostsCallBack: MyPostsCallBack) {
                     .height(1.dp)
                     .background(Color.White)
             )
-            if(myPosts.size>0){
+            if(myChannels.size>0){
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(offwhite)
                 ) {
-                    items(myPosts){
-                        ColumnItem(
-                            modifier = Modifier,
-                            id = it.id,
-                            title = it.title,
-                            time = it.time,
-                            deadline = it.time,
-                            isAvailable = it.isAvailable,
-                            myPostsCallBack,
-                            it.size
-                        )
+                    items(myChannels){
+                        it.members?.let { it1 ->
+                            ChannelsCard(modifier = Modifier,
+                                id = it.channelId,
+                                title = it.title,
+                                owner=it.channelOwner,
+                                size = it1.size ,
+                                myChannelsCallBack=myChannelsCallBack)
+                        }
                     }
 
                 }
-
             }
             else{
                 Box(
@@ -199,7 +134,7 @@ fun MyPostScreen(myPostsCallBack: MyPostsCallBack) {
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "No post available",
+                        text = "No channel available",
                         style = TextStyle(
                             color = Color.Gray,
                             fontSize = 20.sp,
@@ -216,27 +151,39 @@ fun MyPostScreen(myPostsCallBack: MyPostsCallBack) {
 }
 
 @Composable
-fun ColumnItem(
-               modifier: Modifier,
-               id:String,
-               title: String,
-               time:String,
-               deadline:String,
-               isAvailable:Boolean,
-               myPostsCallBack: MyPostsCallBack,
-               size:Int
+fun ChannelsCard(
+    modifier: Modifier,
+    id:String,
+    title: String,
+    owner:String,
+    size:Int,
+    myChannelsCallBack: MyChannelsCallBack
 
 ) {
 
     val offwhite=Color(0xffe5bdc4)
     val db = Firebase.firestore
+    var ownerName by remember { mutableStateOf("Owner") }
+    val ownerDoc=FirebaseFirestore.getInstance().collection("users").document(owner)
+    ownerDoc.get()
+        .addOnSuccessListener { document ->
+            if (document != null && document.exists()) {
+                ownerName = document.getString("fullname").toString()
+                // Do something with the full name
+            } else {
+                // Document does not exist or is null
+            }
+        }
+        .addOnFailureListener { exception ->
+            // Handle errors
+        }
 
     Card(
         modifier
             .padding(start = 10.dp, end = 10.dp, top = 4.dp, bottom = 4.dp)
             .wrapContentSize()
             .clickable {
-                myPostsCallBack.OnCardClick(id)
+                myChannelsCallBack.onChannelClick(id)
             },
         colors = CardDefaults.cardColors(
             containerColor = Color.White
@@ -268,7 +215,7 @@ fun ColumnItem(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "Total Applicants: $size",
+                        text = "Joined: $size",
                         style = TextStyle(
                             color = Color.Black,
                             fontSize = 14.sp,
@@ -277,17 +224,9 @@ fun ColumnItem(
                         ),
                         color=Color.Black
                     )
-
                     Spacer(modifier = Modifier.weight(1f))
-                    Icon(
-                        imageVector = Icons.Outlined.Schedule,
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp),
-                        tint = Color.Black
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = time,
+                        text = "Owner: $ownerName",
                         style = TextStyle(
                             color = Color.Black,
                             fontSize = 14.sp,
@@ -296,19 +235,6 @@ fun ColumnItem(
                         ),
                         color=Color.Black
                     )
-                    val availabilityIcon = if (isAvailable) {
-                        Icons.Default.CheckCircle
-                    } else {
-                        Icons.Default.Close
-                    }
-
-                    /*Icon(
-                        imageVector = availabilityIcon,
-                        contentDescription = null,
-                        tint = if (true) Color.Green else Color.Red,
-                        modifier = Modifier.size(24.dp)
-                    )*/
-
                 }
             }
 
@@ -332,55 +258,19 @@ fun ColumnItem(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 8.dp),
+                    .padding(top = 4.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
 
                 BlinkingText(
-                    text = "Tap to see the applicants",
+                    text = "Tap to see the chat",
                     color = Color.Gray,
                     size = 12.0f
                 )
 
-                // Spacer
-                Spacer(modifier = Modifier.width(4.dp))
-
-                // Availability Text
-                Text(
-                    text = if (isAvailable) "Available" else "Not Available",
-                    color = if (isAvailable) Color.Green else Color.Red
-                )
             }
         }
     }
 
 }
-@Composable
-fun BlinkingText(
-    text: String,
-    color:Color,
-    size: Float
-) {
 
-    Text(
-        text = text,
-        style = MaterialTheme.typography.bodySmall.copy(
-            fontWeight = FontWeight.Bold,
-            color = color,
-            fontSize = size.sp
-        ),
-        modifier = Modifier.padding(bottom = 8.dp)
-    )
-}
-
-data class Post(
-    val id: String,
-    val title: String,
-    val time:String,
-    val isAvailable: Boolean,
-    val size:Int
-)
-@Preview
-@Composable
-fun MyPostScreenPreview() {
-}

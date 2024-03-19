@@ -1,5 +1,7 @@
 package com.example.cmbss
 
+import android.content.ContentValues
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -57,12 +59,15 @@ import androidx.core.content.ContextCompat
 import com.example.cmbss.ui.theme.Primary
 import com.example.cmbss.ui.theme.primaryColor
 import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.firestore
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostDetails(postDetailsCallBack: PostDetailsCallBack,postId:String,title:String,
                 description:String,deadline:String,salary:String,fullname:String,qualification:String){
+    val currentUser = FirebaseAuth.getInstance().currentUser
+    val currentuserId = currentUser?.uid
     val bgcolor = Color(0xFF3EA7D7)
     val db = Firebase.firestore
     val collectionRef = db.collection("posts")
@@ -73,6 +78,11 @@ fun PostDetails(postDetailsCallBack: PostDetailsCallBack,postId:String,title:Str
     var description by remember {
         mutableStateOf("")
     }
+    var isAlreadyApplied by remember {
+        mutableStateOf(false)
+    }
+    var posterId by remember { mutableStateOf("") }
+    var poster_email by remember { mutableStateOf("") }
 
     documentRef.get()
         .addOnSuccessListener { document ->
@@ -80,6 +90,7 @@ fun PostDetails(postDetailsCallBack: PostDetailsCallBack,postId:String,title:Str
                 val postId= document.id
                 title= document.getString("title").toString()
                 description=document.getString("description").toString()
+                poster_email=document.getString("email").toString()
                 // Now you have the document ID (postId)
                 println("Document ID: $postId\n $title   $description")
             } else {
@@ -90,6 +101,45 @@ fun PostDetails(postDetailsCallBack: PostDetailsCallBack,postId:String,title:Str
             println("Error getting document: $exception")
         }
 
+    val usersCollection = db.collection("users")
+    usersCollection.whereEqualTo("email", poster_email)
+        .get()
+        .addOnSuccessListener { documents ->
+            for (document in documents) {
+                posterId=document.id
+            }
+        }
+        .addOnFailureListener { exception ->
+            // Handle any errors that occurred during the query
+            Log.w(ContentValues.TAG, "Error getting documents: ", exception)
+        }
+
+    db.collection("channels").document(postId)
+        .get()
+        .addOnSuccessListener { channelDoc ->
+            val members = channelDoc.get("members") as? List<String>
+            if (members != null && currentuserId in members) {
+                isAlreadyApplied=true
+            } else {
+                // The current user is not a member of the channel
+            }
+        }
+        .addOnFailureListener { exception ->
+            // Handle any errors
+        }
+    db.collection("posts").document(postId)
+        .get()
+        .addOnSuccessListener { postDoc ->
+            val applicants = postDoc.get("applicants") as? List<String>
+            if (applicants != null && currentuserId in applicants) {
+                isAlreadyApplied=true
+            } else {
+                // The current user has not applied to the post
+            }
+        }
+        .addOnFailureListener { exception ->
+            // Handle any errors
+        }
     val sky = Color(0xFFA7E3FF)
 
     Box(
@@ -208,7 +258,7 @@ fun PostDetails(postDetailsCallBack: PostDetailsCallBack,postId:String,title:Str
 
                     Button(
                         onClick = {
-                            postDetailsCallBack.OnApply()
+                            postDetailsCallBack.OnApply(posterId,isAlreadyApplied)
                         }, modifier = Modifier
                             .fillMaxWidth()
                             .heightIn(min = 50.dp),
@@ -216,7 +266,7 @@ fun PostDetails(postDetailsCallBack: PostDetailsCallBack,postId:String,title:Str
                         colors = ButtonDefaults.buttonColors(bgcolor)
                     ) {
                         Text(
-                            text = "Apply",
+                            text = if(isAlreadyApplied)"Applied" else "Apply",
                             style = TextStyle(
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Medium,
