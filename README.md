@@ -1,7 +1,5 @@
 # Annolink (An Annotation Platform)
 
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-
 ## Overview
 
 Annolink is a platform where annotators can find jobs to annotate and earn money, while researchers can find annotators to annotate their data for research purposes. It bridges the gap between researchers seeking data annotation services and annotators looking for job opportunities.
